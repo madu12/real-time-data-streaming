@@ -1,7 +1,7 @@
-# Real-Time Data Streaming using Kafka
+# Real-Time ISS Data Streaming using Kafka
 
 ## Description
-This project demonstrates real-time data streaming using **Apache Kafka** and Python. It fetches live data from the International Space Station (ISS) location API (`http://api.open-notify.org/iss-now.json`), streams it to a Kafka topic, processes it in real-time with a Kafka consumer, and provides descriptive statistics while saving the data to persistent storage.
+This project demonstrates real-time data streaming using **Apache Kafka** and Python. It fetches live data from the International Space Station (ISS) location API (`http://api.open-notify.org/iss-now.json`), streams it to a Kafka topic, processes it with a Kafka consumer, displays descriptive statistics, and saves the data to an SQLite database.
 
 ---
 
@@ -92,6 +92,51 @@ python consumer.py
 
 ---
 
+## SQLite Database
+
+The streamed data is stored in an SQLite database named `iss_location.db`. The database contains a table `iss_location` with the following schema:
+
+| Column     | Type    | Description               |
+|------------|---------|---------------------------|
+| timestamp  | TEXT    | Timestamp of the data     |
+| latitude   | REAL    | Latitude of the ISS       |
+| longitude  | REAL    | Longitude of the ISS      |
+
+### Querying the Data
+You can query the SQLite database using any SQLite client or Python.
+
+#### Example SQL Queries:
+1. View all records:
+   ```sql
+   SELECT * FROM iss_location;
+   ```
+
+2. Calculate the average latitude and longitude:
+   ```sql
+   SELECT AVG(latitude) AS avg_latitude, AVG(longitude) AS avg_longitude FROM iss_location;
+   ```
+
+3. Get the latest ISS location:
+   ```sql
+   SELECT * FROM iss_location ORDER BY timestamp DESC LIMIT 1;
+   ```
+
+---
+
+## Features
+
+1. **Real-Time Data Streaming**:
+   - Fetches live ISS location data via the API and streams it to Kafka.
+
+2. **Descriptive Statistics**:
+   - Dynamically calculates and displays statistics for latitude and longitude.
+
+3. **Persistent Storage**:
+   - Saves streamed data into an SQLite database for future analysis.
+
+---
+
+
 ## Requirements
 
 ### Python Dependencies
@@ -124,18 +169,32 @@ pip install -r requirements.txt
   2024-12-16 14:05:00 - INFO - Kafka Producer stopped by user.
   ```
 
-### Consumer with Statistics and Storage:
-```
-Received: {'timestamp': '1689312312', 'iss_position': {'latitude': '12.3456', 'longitude': '-45.6789'}}
-Descriptive Statistics:
-       latitude  longitude
-count   2.00000 -45.676150
-mean   12.34675 -45.676150
-std     0.00234   0.003889
-min    12.34560 -45.678900
-max    12.34890 -45.673400
-Saved to database: [{'timestamp': '1689312312', 'latitude': 12.3456, 'longitude': -45.6789}]
-```
+### Consumer:
+- On receiving a new record:
+  ```
+  Received: {'timestamp': '1689312312', 'iss_position': {'latitude': '12.3456', 'longitude': '-45.6789'}}
+  ```
+- Descriptive statistics:
+  ```
+  Descriptive Statistics:
+         latitude  longitude
+  count   2.00000 -45.676150
+  mean   12.34675 -45.676150
+  std     0.00234   0.003889
+  min    12.34560 -45.678900
+  max    12.34890 -45.673400
+  ```
+- On saving to the database:
+  ```
+  Saved 10 records to database.
+  ```
+
+- When interrupted with `Ctrl+C`:
+  ```
+  2024-12-16 14:20:00 - INFO - Kafka Consumer interrupted. Closing...
+  2024-12-16 14:20:00 - INFO - Final flush: Saved 3 records to database.
+  2024-12-16 14:20:00 - INFO - Kafka Consumer stopped.
+  ```
 
 ---
 
