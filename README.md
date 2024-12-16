@@ -59,12 +59,12 @@ cd real-time-data-streaming
 1. **Download Kafka**:
    Download the latest release from the [Kafka Quickstart](https://kafka.apache.org/quickstart) page.
 
-2. **Start ZooKeeper**:
+2. **Start ZooKeeper Service**:
    ```bash
    bin/zookeeper-server-start.sh config/zookeeper.properties
    ```
 
-3. **Start Kafka Broker**:
+3. **Start Kafka Broker Service**:
    ```bash
    bin/kafka-server-start.sh config/server.properties
    ```
